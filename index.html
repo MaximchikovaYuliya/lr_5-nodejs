@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script>
+        function Get() {
+            console.log('GET');
+            fetch('http://localhost:5000/api/db', {
+                method: 'GET', mode: 'no-cors',
+                headers: {'Content-Type':'application/json', 'Accept':'application/json'}
+            })
+                .then(response => response.json())
+                .then(pdata => {
+                    result.innerHTML = '';
+                    console.log('pdata', pdata);
+                    let content = '<table class="table"><thead><tr>' +
+                        '      <th scope="col">ID</th>\n' +
+                        '      <th scope="col">Full name</th>\n' +
+                        '      <th scope="col">Birthday</th>\n' +
+                        '    </tr></thead><tbody>\n';
+                    for (let i = 0; i<pdata.length; i++) {
+                        content += '<tr><td>' + pdata[i].id + '</td><td>' + pdata[i].name + '</td><td>' + pdata[i].bday + '</td></tr>';
+                    };
+                    result.innerHTML += content + '</tbody></table>';
+                });
+        }
+
+        function Post() {
+            console.log('POST');
+            fetch('http://localhost:5000/api/db', {
+                method: 'POST', mode: 'no-cors',
+                headers: {'Content-Type':'application/json', 'Accept':'application/json'},
+                body: JSON.stringify({id: ID.value, name: NAME.value, bday: BDAY.value})
+            })
+                .then(response => response.json())
+                .then((pdata) => {
+                    console.log('POST.pdata', pdata);
+                });
+        }
+
+        function Delete() {
+            console.log('DELETE');
+            fetch('http://localhost:5000/api/db?id=' + ID.value, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then((pdata) => {
+                    console.log('DELETE.pdata', pdata);
+                });
+        }
+
+        function Put() {
+            console.log('PUT');
+            fetch('http://localhost:5000/api/db', {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json', 'Accept':'application/json'},
+                body: JSON.stringify({id: parseInt(ID.value, 10), name: NAME.value, bday: BDAY.value})
+            })
+                .then(response => response.json())
+                .then((pdata) => {
+                    console.log('PUT.pdata', pdata);
+                });
+        }
+    </script>
+</head>
+<body>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group mb-3">
+                <input id="ID" type="text" class="form-control" placeholder="ID" aria-label="ID" aria-describedby="basic-addon1">
+            </div>
+            <div class="input-group mb-3">
+                <input id="NAME" type="text" class="form-control" placeholder="Full name" aria-label="Full name" aria-describedby="basic-addon1">
+            </div>
+            <div class="input-group mb-3">
+                <input id="BDAY" type="text" class="form-control" placeholder="Birthday" aria-label="Birthday" aria-describedby="basic-addon1">
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-start">
+        <div class="col">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary" onclick="Post()">POST</button>
+                <button type="button" class="btn btn-outline-success" onclick="Get()">GET</button>
+                <button type="button" class="btn btn-outline-danger" Onclick="Put()">PUT</button>
+                <button type="button" class="btn btn-outline-warning" onclick="Delete()">DELETE</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm mt-3" id="result"></div>
+    </div>
+</div>
+</body>
+</html>
