@@ -2,6 +2,26 @@ const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const db_module  = require('./db_module');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+let timer;
+
+rl.on('line', (input) => {
+    if (/sd \d+/.test(input)) {
+        if (timer != null)
+            clearTimeout();
+        let start = Date.now();
+        timer = setTimeout(() => {
+            console.log('Passed time: ' + (Date.now() - start));
+            process.exit(1);
+            }, Number(input.match(/\d+/g)));
+    }
+});
 
 let db = new db_module.DB();
 

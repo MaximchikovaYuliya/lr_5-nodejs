@@ -24,6 +24,9 @@ function DB() {
         let result = delete_data(id);
         process.nextTick(() => callback(result))
     };
+    this.commit = (callback) => {
+        process.nextTick(() => callback())
+    };
 }
 
 function select() {return db_data;}
