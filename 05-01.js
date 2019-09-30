@@ -9,17 +9,38 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-let timer;
+let timer_sd, timer_sc, timer_ss;
+let req_counter, commit_counter;
 
 rl.on('line', (input) => {
+    if (input === 'sd' && timer_sd != null) {
+        console.log('Timer is canceled.');
+        clearTimeout(timer_sd);
+    }
+    if (input === 'sc' && timer_sc != null) {
+        console.log('Timer is canceled.');
+        clearTimeout(timer_sc);
+    }
     if (/sd \d+/.test(input)) {
-        if (timer != null)
-            clearTimeout();
+        if (timer_sd != null) {
+            clearTimeout(timer_sd);
+        }
         let start = Date.now();
-        timer = setTimeout(() => {
+        timer_sd = setTimeout(() => {
             console.log('Passed time: ' + (Date.now() - start));
             process.exit(1);
             }, Number(input.match(/\d+/g)));
+    }
+    if (/sc \d+/.test(input)) {
+        timer_sc = setInterval(() => {
+            db.commit(() => console.log('Commit'));
+            commit_counter++;
+        }, Number(input.match(/\d+/g)));
+    }
+    if (/ss \d+/.test(input)) {
+        req_counter = 0;
+        commit_counter = 0;
+        timer_ss = setTimeout(() => console.log("Requests: " + req_counter + "\nCommits: " + commit_counter), Number(input.match(/\d+/g)));
     }
 });
 
@@ -55,7 +76,7 @@ db.on('DELETE', (req, res) => {
     db.delete(r, (result) => {res.end(JSON.stringify(result));});
 });
 
-http.createServer(function (request, response) {
+const server = http.createServer(function (request, response) {
     if (url.parse(request.url).pathname === '/') {
         let html = fs.readFile('./index.html', (err, data) => {
             response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
@@ -65,5 +86,7 @@ http.createServer(function (request, response) {
         db.emit(request.method, request, response);
     }
 }).listen(5000);
+
+server.on('request', () => req_counter++);
 
 console.log('Server created on http://localhost:5000/');
