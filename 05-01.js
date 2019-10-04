@@ -28,7 +28,10 @@ rl.on('line', (input) => {
         let start = Date.now();
         timer_sd = setTimeout(() => {
             console.log('Passed time: ' + (Date.now() - start));
-            process.exit(1);
+            server.close(() => {
+                console.log('Server terminate');
+                process.exit(1);
+            });
             }, Number(input.match(/\d+/g)));
     }
     if (/sc \d+/.test(input)) {
@@ -84,6 +87,9 @@ const server = http.createServer(function (request, response) {
         });
     } else if (url.parse(request.url).pathname === '/api/db') {
         db.emit(request.method, request, response);
+    } else if (url.parse(request.url).pathname === '/api/ss') {
+        response.writeHead(200, {'Content-Type':'application/json; charset=utf-8'});
+
     }
 }).listen(5000);
 
