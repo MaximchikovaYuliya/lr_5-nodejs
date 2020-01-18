@@ -33,19 +33,26 @@ function select() {return db_data;}
 
 function insert(data) {
     db_data.push(data);
-    return data.id;
+    return data;
 }
 
 function update(data) {
-    db_data[db_data.findIndex((el) => el.id === data.id)] = data;
-    return data.id;
+    let update_index = db_data.findIndex((el) => el.id === data.id);
+    if (update_index != -1) {
+        db_data[update_index] = data;
+        return data;
+    } else
+        return JSON.parse('{"error": "record with such index doesn\'t exist"}');
 }
 
 function delete_data (id) {
     let delete_index = db_data.findIndex((el) =>  el.id === id);
-    let delete_row = db_data[delete_index];
-    db_data.splice(delete_index, 1);
-    return delete_row;
+    if(delete_index != -1) {
+        let delete_row = db_data[delete_index];
+        db_data.splice(delete_index, 1);
+        return delete_row;
+    } else
+        return JSON.parse('{"error": "record with such index doesn\'t exist"}');
 }
 
 util.inherits(DB, ee.EventEmitter);

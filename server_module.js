@@ -47,14 +47,17 @@ rl.on('line', (input) => {
     if (input === 'sc' && timer_sc != null) {
         console.log('Timer is canceled.');
         clearTimeout(timer_sc);
+        timer_sc.unref();
     }
     if (/sd \d+/.test(input)) {
         if (timer_sd != null) {
             clearTimeout(timer_sd);
+            timer_sd.unref();
         }
         let start = Date.now();
         timer_sd = setTimeout(() => {
             console.log('Passed time: ' + (Date.now() - start));
+            timer_sd.unref();
             server.close(() => {
                 console.log('Server terminate');
                 process.exit(1);
